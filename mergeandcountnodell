@@ -1,0 +1,275 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node{
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;    // First linked list head
+struct node *head2 = NULL;   // Second linked list head
+
+// Function declarations
+void firstinsert(struct node **head_ref);
+void lastinsert(struct node **head_ref);
+void randominsert(struct node **head_ref);
+void begindelete(struct node **head_ref);
+void lastdelete(struct node **head_ref);
+void randomdelete(struct node **head_ref);
+void search(struct node *head_ref);
+void display(struct node *head_ref);
+void merge(); // Function to merge two linked lists and calculate node count
+
+int main() {
+    int choice = 0;
+    while(choice != 12) {
+        printf("\nMAIN MENU\n");
+        printf("\n1. Begin insert in List 1\n2. Last insert in List 1\n3. Insert random in List 1\n4. Delete at beginning in List 1\n");
+        printf("5. Delete from the last in List 1\n6. Delete from random position in List 1\n7. Search element in List 1\n8. Display List 1\n");
+        printf("9. Insert into List 2\n10. Display List 2\n11. Merge both lists and count nodes\n12. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        switch(choice) {
+            case 1:
+                firstinsert(&head);
+                break;
+            case 2:
+                lastinsert(&head);
+                break;
+            case 3:
+                randominsert(&head);
+                break;
+            case 4:
+                begindelete(&head);
+                break;
+            case 5:
+                lastdelete(&head);
+                break;
+            case 6:
+                randomdelete(&head);
+                break;
+            case 7:
+                search(head);
+                break;
+            case 8:
+                display(head);
+                break;
+            case 9:
+                lastinsert(&head2);
+                break;
+            case 10:
+                display(head2);
+                break;
+            case 11:
+                merge();
+                break;
+            case 12:
+                exit(0);
+            default:
+                printf("\nInvalid choice\n");
+        }
+    }
+    return 0;
+}
+
+// Insert at the beginning
+void firstinsert(struct node **head_ref) {
+    struct node *ptr;
+    int item;
+    ptr = (struct node *)malloc(sizeof(struct node));
+    if (ptr == NULL) {
+        printf("\nOverflow\n");
+    } else {
+        printf("Enter the value: ");
+        scanf("%d", &item);
+        ptr->data = item;
+        ptr->next = *head_ref;
+        *head_ref = ptr;
+        printf("\nNode inserted at beginning\n");
+    }
+}
+
+// Insert at the end
+void lastinsert(struct node **head_ref) {
+    struct node *ptr, *temp;
+    int item;
+    ptr = (struct node *)malloc(sizeof(struct node));
+    if (ptr == NULL) {
+        printf("\nOverflow\n");
+    } else {
+        printf("Enter the value: ");
+        scanf("%d", &item);
+        ptr->data = item;
+        ptr->next = NULL;
+        if (*head_ref == NULL) {
+            *head_ref = ptr;
+        } else {
+            temp = *head_ref;
+            while (temp->next != NULL) {
+                temp = temp->next;
+            }
+            temp->next = ptr;
+        }
+        printf("\nNode inserted at end\n");
+    }
+}
+
+// Insert at random position
+void randominsert(struct node **head_ref) {
+    struct node *ptr, *temp;
+    int i, loc, item;
+    ptr = (struct node *)malloc(sizeof(struct node));
+    if (ptr == NULL) {
+        printf("\nOverflow\n");
+    } else {
+        printf("\nEnter the value: ");
+        scanf("%d", &item);
+        ptr->data = item;
+        printf("\nEnter the location where value to be inserted: ");
+        scanf("%d", &loc);
+        temp = *head_ref;
+        for (i = 0; i < loc - 1; i++) {
+            temp = temp->next;
+            if (temp == NULL) {
+                printf("\nLocation does not exist\n");
+                return;
+            }
+        }
+        ptr->next = temp->next;
+        temp->next = ptr;
+        printf("\nNode inserted at specified location\n");
+    }
+}
+
+// Delete at the beginning
+void begindelete(struct node **head_ref) {
+    struct node *ptr;
+    if (*head_ref == NULL) {
+        printf("\nList is empty\n");
+    } else {
+        ptr = *head_ref;
+        *head_ref = ptr->next;
+        free(ptr);
+        printf("\nNode deleted from the beginning\n");
+    }
+}
+
+// Delete at the end
+void lastdelete(struct node **head_ref) {
+    struct node *ptr, *ptr1;
+    if (*head_ref == NULL) {
+        printf("\nCan't delete, list is empty\n");
+    } else if ((*head_ref)->next == NULL) {
+        *head_ref = NULL;
+        free(*head_ref);
+        printf("\nOnly node deleted, now the list is empty\n");
+    } else {
+        ptr = *head_ref;
+        while (ptr->next != NULL) {
+            ptr1 = ptr;
+            ptr = ptr->next;
+        }
+        ptr1->next = NULL;
+        free(ptr);
+        printf("\nNode deleted from the end\n");
+    }
+}
+
+// Delete at random position
+void randomdelete(struct node **head_ref) {
+    struct node *ptr, *ptr1;
+    int i, loc;
+    printf("\nEnter the location where you want to delete the node: ");
+    scanf("%d", &loc);
+    ptr = *head_ref;
+    for (i = 0; i < loc - 1; i++) {
+        ptr1 = ptr;
+        ptr = ptr->next;
+        if (ptr == NULL) {
+            printf("\nNode not found\n");
+            return;
+        }
+    }
+    ptr1->next = ptr->next;
+    free(ptr);
+    printf("\nNode successfully deleted from location %d\n", loc);
+}
+
+// Search for an element
+void search(struct node *head_ref) {
+    struct node *ptr;
+    int item, i = 0, flag = 0;
+    ptr = head_ref;
+    if (ptr == NULL) {
+        printf("\nList is empty\n");
+    } else {
+        printf("\nEnter the element to search: ");
+        scanf("%d", &item);
+        while (ptr != NULL) {
+            if (ptr->data == item) {
+                printf("\nItem found at location %d\n", i + 1);
+                flag = 1;
+                break;
+            }
+            i++;
+            ptr = ptr->next;
+        }
+        if (flag == 0) {
+            printf("\nItem not found\n");
+        }
+    }
+}
+
+// Display the linked list
+void display(struct node *head_ref) {
+    struct node *ptr;
+    ptr = head_ref;
+    if (ptr == NULL) {
+        printf("\nList is empty\n");
+    } else {
+        printf("\nPrinting the linked list\n");
+        while (ptr != NULL) {
+            printf("%d\t", ptr->data);
+            ptr = ptr->next;
+        }
+        printf("\n");
+    }
+}
+
+// Merge the two linked lists and calculate the total number of nodes
+void merge() {
+    struct node *ptr;
+    int count = 0;
+
+    if (head == NULL && head2 == NULL) {
+        printf("\nBoth lists are empty\n");
+        return;
+    }
+
+    // Traverse the first list and count its nodes
+    ptr = head;
+    while (ptr != NULL) {
+        count++;
+        if (ptr->next == NULL) {
+            // At the last node of the first list
+            ptr->next = head2;  // Link the end of list 1 to the start of list 2
+            break;
+        }
+        ptr = ptr->next;
+    }
+
+    // If the first list is empty, set it to the second list
+    if (head == NULL) {
+        head = head2;
+    }
+
+    // Count the nodes in the second list
+    ptr = head2;
+    while (ptr != NULL) {
+        count++;
+        ptr = ptr->next;
+    }
+
+    printf("\nLinked lists merged\n");
+    printf("Total number of nodes in the merged list: %d\n", count);
+}
